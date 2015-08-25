@@ -1,0 +1,339 @@
+<html>
+    <head>
+        <title>Animation</title>
+    </head>
+    <style>
+        
+        * {
+            font-family: helvetica;
+            font-size: 12px;
+        }
+        
+        body {
+            margin: 0;
+            padding: 0;
+        }
+        
+        p.title {
+            border: 1px solid #ccc;
+            background-color: #dedede;
+            padding: 5px;
+            text-align: center;
+            color: #552222;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        
+        div.col {
+            float: left;
+            display: block;
+            margin-right: 10px;
+            margin-left: 10px;
+        }
+        
+        table.grid {
+            border: 1px solid #ccc;
+            border-collapse: separate;
+        }
+        
+        
+        table.grid td {
+            color: #444;
+            padding: 10px 8px;
+            text-align: center;
+            border: 5px solid #fff;
+        }
+        
+        table.grid td.even {
+            color: #444;
+            padding: 10px 8px;
+            text-align: center;
+            background-color: #DCA7A7;
+            border: 5px solid #fff;
+        }
+        
+        table.grid td.prime {
+            color: #444;
+            padding: 10px 8px;
+            text-align: center;
+            background-color: #AAAA55;
+        }
+        
+        div.logger {
+            border: 1px solid #ccc;
+            width: 300px;
+        }
+        
+        div.activity-title {
+            border: 1px solid #ccc;
+            background-color: #dedede;
+            padding: 5px;
+            text-align: center;
+            color: #552222;
+            font-weight: bold;
+            font-size: 13px;
+        }
+        
+        div.event {
+            padding: 5px 5px;
+            color: #444;
+        }
+        
+        div.event ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+        
+        div.event ul li.event-name {
+            display: inline-block;
+            width: 75%;
+            border-right: 1px dotted #ccc;
+            color: inherit;
+        }
+        
+        div.event ul li.status {
+            display: inline-block;
+            text-transform: uppercase;
+            color: green;
+            font-weight: bold;
+            text-align: center;
+            padding-left: 5px;
+        }
+        
+        div.event-col {
+            float: left;
+            display: block;
+            border: 1px solid red;
+        }
+        
+    </style>
+    <body>
+        <p id="op-title" class="title">Sieve of Eratosthenes Animation</p>
+        
+        <div class="col">
+            <div id="container"></div>
+        </div>
+        <div class="col">
+            <div class="logger" id="event-log">
+                <div class="activity-title">Activity</div>
+                <div class="event">
+                    <ul>
+                        <li class="event-name">Showing first 120 Natural Numbers</li>
+                        <li class="status">Done</li>
+                    </ul>
+                </div>
+                
+            </div>
+        </div>
+    </body>
+    <script type="text/javascript">
+        
+        // Number of natural numbers in the grid
+        var limit = 120;
+        
+        var table = document.createElement( 'table' );
+        table.setAttribute( 'cellpadding', '0' );
+        table.setAttribute( 'cellspacing', '0' );
+        table.setAttribute( 'border', '0' );
+        table.setAttribute( 'class', 'grid' );
+        
+        // First Loop determines row count
+        // Each row contains 10 numbers, and hence we increment by 10
+        for( var i = 1; i < limit; i+=10 ) {
+            
+            var tr = document.createElement( 'tr' );
+            
+            // Second Loop determines data in each row
+            for ( var j = 0; j < 10; j++ ) {
+                
+                var num = i+j;
+                
+                // Create td
+                var td  = document.createElement( 'td' );
+                var id  = 'num-' + num; 
+                td.setAttribute( 'id', id );
+                td.innerHTML = num;
+                
+                // Add the "td" to the "tr"
+                tr.appendChild( td );
+            }
+            
+            // Add the "tr" to the "table"
+            table.appendChild( tr );
+        }
+        
+        // Add "table" to the container div
+        var container_div = document.getElementById( "container" );
+        container_div.appendChild( table );
+        
+        // Determine even numbers, we wait (sleep) 1 seconds before executing the function
+        var timer = 1 * 1000;
+        var next_timer;
+        
+        setTimeout( function() {
+            next_timer = show_even_numbers( timer );
+        }, timer );
+        
+        // Waiting 8 seconds
+        setTimeout( function() {
+            next_timer = mark_primes( timer );
+        }, 8 * timer );
+        
+        function show_even_numbers( wait ) {
+            
+            var logger = document.getElementById( 'event-log' );
+            
+            // For logging
+            var event  = document.createElement( 'div' );
+            event.setAttribute( 'class', 'event' );
+            
+            var ul      = document.createElement( 'ul' );
+            var li_desc = document.createElement( 'li' );
+            li_desc.setAttribute( 'class', 'event-name' );
+            li_desc.innerHTML = 'Hightlighting Even Numbers';
+            
+            // Add li to ul
+            ul.appendChild( li_desc );
+            
+            var li_stat = document.createElement( 'li' );
+            li_stat.setAttribute( 'class', 'status' );
+            
+            // Add li to ul
+            ul.appendChild( li_stat );
+            
+            // Add ul to event
+            event.appendChild( ul );
+            
+            // Add event to event-log
+            logger.appendChild( event );
+            
+            var sleep = wait;
+            var lastsleep;
+            
+            for( var i = 1; i < limit; i += 10 ) {
+                for( var j = 0; j < 10; j++ ) {
+                    
+                    // Highlight Even numbered "td"
+                    if( (i+j) % 2 == 0 ) {
+                        
+                        var fnc = function( y ) {
+                            
+                            return function() {
+                                var id = 'num-' + (y);
+                                var td = document.getElementById( id );
+                                td.setAttribute( 'class', 'even' );
+                                
+                                if( y == limit ) {
+                                    li_stat.innerHTML = 'Done';
+                                }
+                            }
+                        }(i+j);
+                        
+                        var t = setTimeout( fnc, sleep );
+                        sleep = sleep + 100;
+                        
+                        if( (i+j) == limit ) {
+                            lastsleep = sleep;
+                        }
+                    }
+                }
+            }
+            
+            return lastsleep;
+        }
+        
+        function mark_primes( wait ) {
+            
+            var logger = document.getElementById( 'event-log' );
+            
+            // For logging
+            var event  = document.createElement( 'div' );
+            event.setAttribute( 'class', 'event' );
+            
+            var ul      = document.createElement( 'ul' );
+            var li_desc = document.createElement( 'li' );
+            li_desc.setAttribute( 'class', 'event-name' );
+            li_desc.innerHTML = 'Finding prime Numbers';
+            
+            // Add li to ul
+            ul.appendChild( li_desc );
+            
+            var li_stat = document.createElement( 'li' );
+            li_stat.setAttribute( 'class', 'status' );
+            
+            // Add li to ul
+            ul.appendChild( li_stat );
+            
+            // Add ul to event
+            event.appendChild( ul );
+            
+            // Add event to event-log
+            logger.appendChild( event );
+            
+            var sleep = wait;
+            var lastsleep;
+            
+            for( var i = 1; i < limit; i += 10 ) {
+                for( var j = 0; j < 10; j++ ) {
+                    
+                    // Highlight prime "td"
+                    if( is_prime(i+j) == 1 ) {
+                        
+                        var fnc = function( y ) {
+                            
+                            return function() {
+                                var id = 'num-' + (y);
+                                var td = document.getElementById( id );
+                                td.setAttribute( 'class', 'prime' );
+                            }
+                        }(i+j);
+                        
+                        var t = setTimeout( fnc, sleep );
+                        sleep = sleep + 100;
+                    }
+                    
+                    setTimeout( function() {
+                        li_stat.innerHTML = 'Done';
+                        lastsleep = sleep;
+                    }, 4000);
+                }
+            }
+            
+            return lastsleep;
+        }
+        
+        
+        // Function to check a number is prime or not
+        function is_prime( num ) {
+            
+            // Assuming initially the num is prime
+            var prime = 1;
+            
+            // return false if num is less than 2
+            if( num < 2 ) {
+                return false;
+            }
+            
+            // return true if num is 2
+            if( num == 2 ) {
+                return true;
+            }
+            
+            // Check if each number starting from 2 is multiple of num
+            // if it is a multiple, change the flag (mark as not prime)
+            // and break from the loop
+            for( var c = 2; c < (num-1); c++) {
+                if( num % c == 0 ) {
+                    prime = 0;
+                    break;
+                }
+            }
+            
+            return ( prime == 0 ) ? false : true;
+        }
+        
+    </script>
+</html>
+
+
